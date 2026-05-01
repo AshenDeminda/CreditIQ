@@ -1,32 +1,29 @@
-```markdown
 # CreditIQ — Credit Risk Assessment Pipeline
 
 CreditIQ is a full-stack machine learning web application designed to predict loan default risk based on the HMEQ dataset. The project features a FastAPI backend serving a pre-trained Random Forest model and a clean HTML/CSS/JS frontend for user interaction.
 
 ## 📂 Project Structure
 
-```text
-credit-risk-app/
-│
-├── backend/
-│   ├── main.py                  ← FastAPI server routing and inference logic
-│   ├── requirements.txt         ← Python dependencies
-│   ├── save_models_colab.py     ← Script to export models from Colab
-│   │
-│   ├── best_rf_model.pkl        ← Pre-trained Random Forest model
-│   ├── lr_model.pkl             ← Pre-trained Logistic Regression model (comparison)
-│   ├── scaler.pkl               ← Data scaler artifact
-│   ├── imputer.pkl              ← Missing value imputer artifact
-│   ├── le_reason.pkl            ← Label encoder for 'Reason'
-│   └── le_job.pkl               ← Label encoder for 'Job'
-│
-├── frontend/
-│   ├── index.html               ← Interactive frontend UI
-│   ├── style.css                ← UI Styling
-│   └── app.js                   ← Frontend logic and API integration
-│
-└── ML_assignment.ipynb          ← Jupyter Notebook for EDA and model training
-```
+    credit-risk-app/
+    │
+    ├── backend/
+    │   ├── main.py                  ← FastAPI server routing and inference logic
+    │   ├── requirements.txt         ← Python dependencies
+    │   ├── save_models_colab.py     ← Script to export models from Colab
+    │   │
+    │   ├── best_rf_model.pkl        ← Pre-trained Random Forest model
+    │   ├── lr_model.pkl             ← Pre-trained Logistic Regression model (comparison)
+    │   ├── scaler.pkl               ← Data scaler artifact
+    │   ├── imputer.pkl              ← Missing value imputer artifact
+    │   ├── le_reason.pkl            ← Label encoder for 'Reason'
+    │   └── le_job.pkl               ← Label encoder for 'Job'
+    │
+    ├── frontend/
+    │   ├── index.html               ← Interactive frontend UI
+    │   ├── style.css                ← UI Styling
+    │   └── app.js                   ← Frontend logic and API integration
+    │
+    └── ML_assignment.ipynb          ← Jupyter Notebook for EDA and model training
 
 ## 🚀 Setup Guide
 
@@ -38,26 +35,23 @@ credit-risk-app/
 ### Step 2: Set Up the Python Environment
 Open your terminal, navigate to the `backend/` folder, and create a virtual environment to keep your packages isolated:
 
-```bash
-cd backend
-python -m venv venv
+    cd backend
+    python -m venv venv
 
-# Activate the virtual environment
-# On Windows:
-venv\Scripts\activate
-# On Mac/Linux:
-source venv/bin/activate
+    # Activate the virtual environment
+    # On Windows:
+    venv\Scripts\activate
+    # On Mac/Linux:
+    source venv/bin/activate
 
-# Install required packages
-pip install -r requirements.txt
-```
+    # Install required packages
+    pip install -r requirements.txt
 
 ### Step 3: Start the Backend Server
 With your virtual environment activated, run the FastAPI server:
 
-```bash
-uvicorn main:app --reload
-```
+    uvicorn main:app --reload
+
 *Note: The server will run on `http://127.0.0.1:8000`. You can test the endpoints via the automatic documentation at `http://127.0.0.1:8000/docs`.*
 
 ### Step 4: Launch the Frontend
@@ -100,4 +94,3 @@ You can test the application using the following sample data profiles:
 * **CORS error in browser console:** Already handled in `main.py` with `allow_origins=["*"]`. Ensure you're opening the HTML file directly or using a simple local server.
 * **"Invalid category value" error:** The `LabelEncoder` was fitted on specific category strings. Make sure REASON is exactly `HomeImp` or `DebtCon` and JOB is exactly one of: `Mgr`, `Office`, `ProfExe`, `Sales`, `Self`, `Other`.
 * **Packages version mismatch warning:** The `scikit-learn` version used to train the model must match the one installed in the backend. Check with `python -c "import sklearn; print(sklearn.__version__)"` in your Colab and in your local environment.
-```
