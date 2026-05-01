@@ -1,152 +1,103 @@
-# CreditIQ — Setup Guide
-## Credit Risk Assessment Web App (FastAPI + HTML/CSS/JS)
+```markdown
+# CreditIQ — Credit Risk Assessment Pipeline
 
----
+CreditIQ is a full-stack machine learning web application designed to predict loan default risk based on the HMEQ dataset. The project features a FastAPI backend serving a pre-trained Random Forest model and a clean HTML/CSS/JS frontend for user interaction.
 
-## PROJECT FOLDER STRUCTURE
+## 📂 Project Structure
 
-```
+```text
 credit-risk-app/
 │
 ├── backend/
-│   ├── main.py                  ← FastAPI server
-│   ├── requirements.txt         ← Python packages
-│   ├── save_models_colab.py     ← Run this in Colab to export models
+│   ├── main.py                  ← FastAPI server routing and inference logic
+│   ├── requirements.txt         ← Python dependencies
+│   ├── save_models_colab.py     ← Script to export models from Colab
 │   │
-│   ├── best_rf_model.pkl        ← (you download from Colab)
-│   ├── lr_model.pkl             ← (you download from Colab)
-│   ├── scaler.pkl               ← (you download from Colab)
-│   ├── imputer.pkl              ← (you download from Colab)
-│   ├── le_reason.pkl            ← (you download from Colab)
-│   └── le_job.pkl               ← (you download from Colab)
+│   ├── best_rf_model.pkl        ← Pre-trained Random Forest model
+│   ├── lr_model.pkl             ← Pre-trained Logistic Regression model (comparison)
+│   ├── scaler.pkl               ← Data scaler artifact
+│   ├── imputer.pkl              ← Missing value imputer artifact
+│   ├── le_reason.pkl            ← Label encoder for 'Reason'
+│   └── le_job.pkl               ← Label encoder for 'Job'
 │
-└── frontend/
-    └── index.html               ← The full UI
+├── frontend/
+│   ├── index.html               ← Interactive frontend UI
+│   ├── style.css                ← UI Styling
+│   └── app.js                   ← Frontend logic and API integration
+│
+└── ML_assignment.ipynb          ← Jupyter Notebook for EDA and model training
 ```
 
----
+## 🚀 Setup Guide
 
-## STEP 1 — Export Models from Google Colab
+### Step 1: Export Models
+1. Open the `ML_assignment.ipynb` notebook (or your Google Colab instance).
+2. Run the code from `save_models_colab.py` in a new cell at the end of the notebook.
+3. Download the 6 generated `.pkl` files and place them inside the `backend/` directory.
 
-1. Open your existing Colab notebook
-2. Add a new cell at the very end
-3. Paste the entire contents of `save_models_colab.py`
-4. Run the cell — it will auto-download 6 .pkl files to your computer
-5. Move all 6 .pkl files into the `backend/` folder in VS Code
-
----
-
-## STEP 2 — Set Up Python Environment in VS Code
-
-Open VS Code terminal and run these commands one by one:
+### Step 2: Set Up the Python Environment
+Open your terminal, navigate to the `backend/` folder, and create a virtual environment to keep your packages isolated:
 
 ```bash
-# Go into the backend folder
-cd credit-risk-app/backend
-
-# Create a virtual environment (keeps packages isolated)
+cd backend
 python -m venv venv
 
-# Activate it:
+# Activate the virtual environment
 # On Windows:
 venv\Scripts\activate
 # On Mac/Linux:
 source venv/bin/activate
 
-# Install all required packages
+# Install required packages
 pip install -r requirements.txt
 ```
 
-You should see "(venv)" in your terminal prompt when it's active.
-
----
-
-## STEP 3 — Start the FastAPI Server
-
-While still inside `backend/` with venv active:
+### Step 3: Start the Backend Server
+With your virtual environment activated, run the FastAPI server:
 
 ```bash
 uvicorn main:app --reload
 ```
+*Note: The server will run on `http://127.0.0.1:8000`. You can test the endpoints via the automatic documentation at `http://127.0.0.1:8000/docs`.*
 
-You should see:
-```
-INFO:     Uvicorn running on http://127.0.0.1:8000
-INFO:     Application startup complete.
-✅ All models loaded successfully!
-```
+### Step 4: Launch the Frontend
+Open the `frontend/index.html` file in your web browser. 
+* If you are using VS Code, right-click the `index.html` file and select **Open with Live Server**.
+* A green "● API Online" badge will appear at the top-right of the UI if it successfully connects to the backend.
 
-Test it by opening: http://127.0.0.1:8000/docs
-(This is the automatic API documentation page FastAPI generates)
+## 🧪 Testing the Application
 
----
+You can test the application using the following sample data profiles:
 
-## STEP 4 — Open the Frontend
+| Field | Low Risk Applicant | High Risk Applicant |
+| :--- | :--- | :--- |
+| **Loan Amount** | 15,000 | 45,000 |
+| **Property Value** | 120,000 | 95,000 |
+| **Mortgage Owed** | 60,000 | 90,000 |
+| **Reason** | HomeImp | DebtCon |
+| **Job** | Mgr | Self |
+| **Years at Job** | 9 | 1 |
+| **Delinquencies** | 0 | 5 |
+| **Derogatory Reports** | 0 | 3 |
+| **Credit Inquiries** | 1 | 8 |
+| **Credit Lines** | 15 | 4 |
+| **Oldest Credit (months)** | 200 | 30 |
+| **Debt-to-Income (%)** | 18 | 72 |
 
-Simply open `frontend/index.html` directly in your browser:
-- Double-click the file in VS Code Explorer, then click "Open with Live Server"
-- OR right-click → Open with → Chrome/Firefox
-- OR in VS Code: install the "Live Server" extension and click "Go Live"
+## ⚙️ Architecture & Data Flow
 
-The green "● API Online" badge at the top-right should appear if the backend is running.
+1. **User Input:** The user fills the form and submits applicant data via the HTML/JS frontend.
+2. **API Request:** `app.js` sends a POST request with a JSON payload containing the 12 fields to the `/predict` endpoint.
+3. **Data Processing:** FastAPI loads the `.pkl` artifacts to encode categorical strings, impute missing values, and scale the numeric features.
+4. **Model Inference:** The primary Random Forest model calculates a probability score. The Logistic Regression model is run for comparison.
+5. **Response:** The API returns the risk score, risk level, system decision (APPROVE, CONDITIONAL, DECLINE), and targeted financial advice.
+6. **UI Rendering:** The frontend dynamically updates the dashboard gauges, advice cards, and risk factor highlights.
 
----
+## ⚠️ Common Errors & Fixes
 
-## STEP 5 — Test the App
-
-Fill in the form with a sample applicant:
-
-| Field           | Low Risk Example | High Risk Example |
-|-----------------|-----------------|------------------|
-| Loan Amount     | 15000           | 45000            |
-| Property Value  | 120000          | 95000            |
-| Mortgage Owed   | 60000           | 90000            |
-| Reason          | HomeImp         | DebtCon          |
-| Job             | Manager         | Self-Employed    |
-| Years at Job    | 9               | 1                |
-| Delinquencies   | 0               | 5                |
-| Derogatory      | 0               | 3                |
-| Credit Inquiries| 1               | 8                |
-| Credit Lines    | 15              | 4                |
-| Oldest Credit   | 200             | 30               |
-| Debt-to-Income  | 18              | 72               |
-
----
-
-## COMMON ERRORS & FIXES
-
-**"API Offline" badge showing**
-→ The FastAPI server isn't running. Go to your terminal and run `uvicorn main:app --reload` inside the `backend/` folder.
-
-**"Model loading error" in terminal**
-→ The .pkl files are missing from the `backend/` folder. Run `save_models_colab.py` in Colab and re-download them.
-
-**CORS error in browser console**
-→ Already handled in main.py with `allow_origins=["*"]`. Make sure you're opening the HTML file directly (not from a different port).
-
-**"Invalid category value" error**
-→ The LabelEncoder was fitted on specific category strings. Make sure REASON is exactly "HomeImp" or "DebtCon" and JOB is exactly one of: Mgr, Office, ProfExe, Sales, Self, Other.
-
-**Packages version mismatch warning**
-→ The scikit-learn version used to train the model must match the one installed here. Check with `python -c "import sklearn; print(sklearn.__version__)"` in your Colab and in VS Code — they should match.
-
----
-
-## HOW IT WORKS (end to end)
-
-```
-User fills form
-     ↓
-index.html (JavaScript)
-     ↓  POST /predict  (JSON with 12 fields)
-FastAPI server (main.py)
-     ↓
-Loads .pkl files → encode → impute → scale
-     ↓
-Random Forest → probability score
-Logistic Regression → comparison score
-     ↓
-Returns: risk_score, risk_level, decision, advice, factors
-     ↓
-index.html renders gauge, bars, advice cards
+* **"API Offline" badge showing:** The FastAPI server isn't running. Go to your terminal and run `uvicorn main:app --reload` inside the `backend/` folder.
+* **"Model loading error" in terminal:** The `.pkl` files are missing from the `backend/` folder. Run `save_models_colab.py` in Colab and re-download them.
+* **CORS error in browser console:** Already handled in `main.py` with `allow_origins=["*"]`. Ensure you're opening the HTML file directly or using a simple local server.
+* **"Invalid category value" error:** The `LabelEncoder` was fitted on specific category strings. Make sure REASON is exactly `HomeImp` or `DebtCon` and JOB is exactly one of: `Mgr`, `Office`, `ProfExe`, `Sales`, `Self`, `Other`.
+* **Packages version mismatch warning:** The `scikit-learn` version used to train the model must match the one installed in the backend. Check with `python -c "import sklearn; print(sklearn.__version__)"` in your Colab and in your local environment.
 ```
